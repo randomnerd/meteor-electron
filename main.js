@@ -1,11 +1,6 @@
 var app = require('app');  // Module to control application life.
 var BrowserWindow = require('browser-window');  // Module to create native browser window.
 var childProcess = require('child_process');
-var config = require('shelljs').config;
-
-// Stop on error
-config.fatal = true;
-
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the javascript object is GCed.
@@ -13,8 +8,8 @@ var mainWindow = null;
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
-  // if (process.platform != 'darwin')
-  app.quit();
+  if (process.platform != 'darwin')
+    app.quit();
 });
 
 
