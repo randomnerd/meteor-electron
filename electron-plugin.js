@@ -8,7 +8,6 @@ var config = Npm.require('shelljs').config;
 Npm.require('shelljs/global');
 
 config.fatal = true;
-
 /* Figure out where to put static files */
 var rootDir = '../../../../../';
 var electronPath = rootDir + '.electron';
@@ -17,7 +16,7 @@ var tmpPath = rootDir + '.tmp';
 
 // Check if electron exists
 if(!test('-e', electronPath))
-  mkdir('-p', rootDir + '.electron');
+  mkdir('-p', electronPath);
 
 // Create Temp dir
 if(!test('-e', tmpPath))
@@ -52,20 +51,19 @@ var electronVersion = '0.25.2';
 var electronUrl = 'https://github.com/atom/electron/releases/download/v';
 var electronFile = 'electron-v' + electronVersion + '-' + osArch + '.zip';
 
-
-
 // If not in tmp and it is not extracted
-if(!test('-f', tmpPath + '/' + electronFile) && !test('-f', electronPath)){
+if(!test('-f', tmpPath + '/' + electronFile) && !test('-f', electronPath + '/electron')){
   echo('Attemping to download electron...');
-  downloadAndExtractElectron()
+  downloadAndExtractElectron();
 }
 // You have the zip but it's not extracted
-else if(test('-f', electronFile) && !test('-f', '.electron/electron')){
+else if(test('-f', electronFile) && !test('-f', electronPath)){
   echo('Extracting electron...');
   extractElectron();
 }
 else{
   echo('Hooray you have it!');
+  downloadExampleFiles();
   startElectron();
 }
 
@@ -75,20 +73,32 @@ function deleteTmp(){
 }
 
 function startElectron(){
+  // Prevent execution if main.js and/or package.json are not present
+  if(!test('-f', electronApp + '/main.js')){
+    return echo('Failed to start electron.\nPlease create a main.js and put it into .electronApp/ or download from: \nhttps://github.com/jrudio/meteor-electron/blob/master/main.js');
+  }
+
+  if(!test('-f', electronApp + '/package.json')){
+    return echo('Failed to start electron.\nPlease create a package.json and put it into .electronApp/ or download from: \nhttps://github.com/jrudio/meteor-electron/blob/master/package.json');
+  }
+
   echo('Starting Electron...');
+  echo('Current dir: ' + ls(electronApp + '/'));
+
   chmod(755, electronPath + '/electron');
-  exec(electronPath + '/electron ' + electronApp, {async: true});
+  chmod(755, electronApp + '/');
+  exec(electronPath + '/electron ' + electronApp + '/', {async: true});
 }
 
 function extractElectron(){
   // Extract contents to electron/
   echo('Extracting electron...');
-  fs.createReadStream(tmpPath + '/' + electronFile).pipe(unzip.Extract({ path: electronPath }))
+  fs.createReadStream(tmpPath + '/' + electronFile).pipe(unzip.Extract({ path: electronPath + '/' }))
     .on('finish', function(){
       echo('Finished extracting file to /.electron');
-
-      deleteTmp();
+      downloadExampleFiles();
       startElectron();
+      deleteTmp();
     });
 }
 
@@ -100,7 +110,7 @@ function downloadAndExtractElectron(){
       }
       else{
         console.error('Something went wrong downloading electron. \nExiting...');
-        throw error('Not 200 status code');
+        process.exit(1);
       }
     })
     .pipe(fs.createWriteStream(tmpPath + '/' + electronFile))
@@ -108,5 +118,44 @@ function downloadAndExtractElectron(){
 }
 
 function downloadExampleFiles(){
+  var mainJSurl = 'https://raw.githubusercontent.com/jrudio/meteor-electron/master/main.js';
 
+  var packageUrl = 'https://raw.githubusercontent.com/jrudio/meteor-electron/master/package.json';
+
+  // Do the files exist?
+  if(!test('-f', electronApp + '/main.js')){
+    request.get(mainJSurl)
+      .on('response', function(response){
+        if(response.statusCode === 200 ){
+          console.log('Downloading main.js ...');
+        }
+        else{
+          console.error('Something went wrong downloading main.js. Please create your own main.js and put it into .electronApp/ \nExiting...');
+          process.exit(1);
+        }
+      })
+      .pipe(fs.createWriteStream(electronApp + '/main.js'))
+      .on('finish', function(){
+        echo('Finished downloading main.js');
+        startElectron();
+      });
+  }
+
+  if(!test('-f', electronApp + '/package.json')){
+    echo('Downloading package.json...');
+    request.get(packageUrl)
+      .on('response', function(response){
+        if(response.statusCode === 200 ){
+          console.log('Downloading package.json ...');
+        }
+        else{
+          console.error('Something went wrong downloading package.json. Please create your own package.json and put it into .electronApp/ \nExiting...');
+          process.exit(1);
+        }
+      })
+      .pipe(fs.createWriteStream(electronApp + '/package.json'))
+      .on('finish', function(){
+        echo('Finished downloading package.json');
+      });
+  }
 }
