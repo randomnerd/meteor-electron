@@ -4,7 +4,7 @@ Package.describe({
   // TODO: Need to revise this
   summary: 'Include Electron in your Meteor app',
   // URL to the Git repository containing the source code for this package.
-  git: '',
+  git: 'https://github.com/jrudio/meteor-electron',
   // By default, Meteor will default to using README.md for documentation.
   // To avoid submitting documentation, set this field to null.
   documentation: 'README.md',
@@ -25,6 +25,6 @@ Package.onUse(function(api) {
 
 Package.onTest(function(api) {
   api.use('tinytest');
-  api.use('electron-plugin');
+  api.use('jrudio:electron');
   api.addFiles('electron-plugin-tests.js', 'server');
 });
