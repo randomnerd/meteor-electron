@@ -19,7 +19,7 @@ var osPlatform = platform.os.family.toLowerCase();
 echo('OS Platform: ' + osPlatform);
 
 var isWindows = windowsRegex.test(osPlatform);
-isWindows = true;
+// isWindows = true;
 
 var electronType;
 
@@ -72,17 +72,17 @@ var electronFile = 'electron-v' + electronVersion + '-' + osArch + '.zip';
 // If not in tmp and it is not extracted
 if(!test('-f', tmpPath + '/' + electronFile) && !test('-f', electronPath + '/' + electronType)){
   echo('Attemping to download electron...');
-  // downloadAndExtractElectron();
+  downloadAndExtractElectron();
 }
 // You have the zip but it's not extracted
-else if(test('-f', electronFile) && !test('-f', electronPath + '/' + electronType)){
+else if(test('-f', tmpPath + '/' + electronFile) && !test('-f', electronPath + '/' + electronType)){
   echo('Extracting electron...');
-  // extractElectron();
+  extractElectron();
 }
-else{
+
+if(test('-f', electronPath + '/' + electronType)){
   echo('Hooray you have it!');
-  // downloadExampleFiles();
-  // startElectron();
+  startElectron();
 }
 
 function deleteTmp(){
@@ -93,21 +93,27 @@ function deleteTmp(){
 function startElectron(){
   // Prevent execution if main.js and/or package.json are not present
   if(!test('-f', electronApp + '/main.js')){
-    return echo('Failed to start electron.\nPlease create a main.js and put it into .electronApp/ or download it from: \nhttps://github.com/jrudio/meteor-electron/blob/master/main.js');
+    echo('Failed to start electron.\nPlease create a main.js and put it into .electronApp/ or download it from: \nhttps://github.com/jrudio/meteor-electron/blob/master/main.js');
+    process.exit(1);
   }
 
   if(!test('-f', electronApp + '/package.json')){
-    return echo('Failed to start electron.\nPlease create a package.json and put it into .electronApp/ or download it from: \nhttps://github.com/jrudio/meteor-electron/blob/master/package.json');
+    echo('Failed to start electron.\nPlease create a package.json and put it into .electronApp/ or download it from: \nhttps://github.com/jrudio/meteor-electron/blob/master/package.json');
+    process.exit(1);
   }
 
   echo('Starting Electron...');
-  echo('Current dir: ' + ls(electronApp + '/'));
 
-  chmod(755, electronPath + '/electron');
-  chmod(755, electronApp + '/');
-
-
-  exec(electronPath + '/' + electronType + ' ' + electronApp + '/', {async: true});
+  if(isWindows){
+    chmod(755, electronPath + '\\' + electronType);
+    chmod(755, electronApp + '\\');
+    exec(electronPath + '\\' + electronType + ' ' + electronApp + '/', {async: true});
+  }
+  else{
+    chmod(755, electronPath + '/' + electronType);
+    chmod(755, electronApp + '/');
+    exec(electronPath + '/' + electronType + ' ' + electronApp + '/', {async: true});
+  }
 }
 
 function extractElectron(){
@@ -115,9 +121,8 @@ function extractElectron(){
   echo('Extracting electron...');
   fs.createReadStream(tmpPath + '/' + electronFile).pipe(unzip.Extract({ path: electronPath + '/' }))
     .on('finish', function(){
-      echo('Finished extracting file to /.electron');
+      echo('Finished extracting electron to /.electron');
       downloadExampleFiles();
-      startElectron();
       deleteTmp();
     });
 }
@@ -138,6 +143,10 @@ function downloadAndExtractElectron(){
 }
 
 function downloadExampleFiles(){
+  function isDone(){
+    return test('-f', electronApp + '/main.js') && test('-f', electronApp + '/package.json');
+  }
+
   var mainJSurl = 'https://raw.githubusercontent.com/jrudio/meteor-electron/master/main.js';
 
   var packageUrl = 'https://raw.githubusercontent.com/jrudio/meteor-electron/master/package.json';
@@ -157,7 +166,6 @@ function downloadExampleFiles(){
       .pipe(fs.createWriteStream(electronApp + '/main.js'))
       .on('finish', function(){
         echo('Finished downloading main.js');
-        startElectron();
       });
   }
 
@@ -178,4 +186,12 @@ function downloadExampleFiles(){
         echo('Finished downloading package.json');
       });
   }
+
+  // Start Electron when both files are done downloading
+  var poll = setInterval(function(){
+    if(isDone()){
+      startElectron();
+      clearInterval(poll);
+    }
+  }, 2000);
 }
