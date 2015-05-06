@@ -1,8 +1,8 @@
 Package.describe({
   name: 'jrudio:electron',
-  version: '0.0.1',
+  version: '0.0.2',
   // TODO: Need to revise this
-  summary: 'Include Electron in your Meteor app',
+  summary: 'Run your Meteor app in Electron',
   // URL to the Git repository containing the source code for this package.
   git: 'https://github.com/jrudio/meteor-electron',
   // By default, Meteor will default to using README.md for documentation.
