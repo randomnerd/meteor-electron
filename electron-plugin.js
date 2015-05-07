@@ -111,12 +111,12 @@ function startElectron(){
 
   // Prevent execution if main.js and/or package.json are not present
   if(!test('-f', electronApp + '/main.js')){
-    echo('Failed to start electron.\nPlease create a main.js and put it into .Electron.electronApp/ or download it from: \nhttps://github.com/jrudio/meteor-electron/blob/master/main.js');
+    echo('Failed to start electron.\nPlease create a main.js and put it into .electronApp/ or download it from: \nhttps://github.com/jrudio/meteor-electron/blob/master/main.js');
     return;
   }
 
   if(!test('-f', electronApp + '/package.json')){
-    echo('Failed to start electron.\nPlease create a package.json and put it into .Electron.electronApp/ or download it from: \nhttps://github.com/jrudio/meteor-electron/blob/master/package.json');
+    echo('Failed to start electron.\nPlease create a package.json and put it into .electronApp/ or download it from: \nhttps://github.com/jrudio/meteor-electron/blob/master/package.json');
     return;
   }
 
@@ -160,7 +160,7 @@ function downloadAndExtract(){
       }
       else{
         console.error('Something went wrong downloading electron. \nExiting...');
-        process.exit(1);
+        return;
       }
     })
     .pipe(fs.createWriteStream(tmpPath + '/' + electronFile))
@@ -185,7 +185,7 @@ function downloadExampleFiles(){
         }
         else{
           console.error('Something went wrong downloading main.js. Please create your own main.js and put it into .Electron.electronApp/ \nExiting...');
-          process.exit(1);
+          return;
         }
       })
       .pipe(fs.createWriteStream(electronApp + '/main.js'))
@@ -203,7 +203,7 @@ function downloadExampleFiles(){
         }
         else{
           console.error('Something went wrong downloading package.json. Please create your own package.json and put it into .Electron.electronApp/ \nExiting...');
-          process.exit(1);
+          return;
         }
       })
       .pipe(fs.createWriteStream(electronApp + '/package.json'))
