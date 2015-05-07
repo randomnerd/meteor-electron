@@ -7,8 +7,8 @@ Package.describe({
   git: 'https://github.com/jrudio/meteor-electron',
   // By default, Meteor will default to using README.md for documentation.
   // To avoid submitting documentation, set this field to null.
-  documentation: 'README.md',
-  debugOnly: true
+  documentation: 'README.md'/*,
+  debugOnly: true*/
 });
 
 Npm.depends({
@@ -21,6 +21,7 @@ Npm.depends({
 Package.onUse(function(api) {
   api.versionsFrom('1.1.0.2');
   api.addFiles('electron-plugin.js', 'server');
+  api.export('Electron');
 });
 
 Package.onTest(function(api) {
