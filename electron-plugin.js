@@ -1,62 +1,38 @@
 var fs = Npm.require('fs');
-var childProcess = Npm.require('child_process');
 var unzip = Npm.require('unzip');
 var request = Npm.require('request');
 var platform = Npm.require('platform');
-var config = Npm.require('shelljs').config;
 
 Npm.require('shelljs/global');
 
-config.fatal = true;
+var rootDir, windowsRegex, electronConfig, osPlatform, isWindows;
 
 /* Figure out where to put static files */
-var rootDir = '../../../../../';
+rootDir = '../../../../../';
+windowsRegex = /win/i;
 
-var windowsRegex = /win/i;
+osPlatform = platform.os.family.toLowerCase();
+isWindows = windowsRegex.test(osPlatform);
 
-var osPlatform = platform.os.family.toLowerCase();
+setElectronType();
+
+var electronPath, electronApp, tmpPath, machineType, osArch;
+
+electronPath = rootDir + '.electron';
+electronApp = rootDir + '.electronApp';
+tmpPath = rootDir + '.tmp';
+
+createFoldersFiles();
+
+electronConfig = JSON.parse(cat(rootDir + 'package.json'));
+
 
 echo('OS Platform: ' + osPlatform);
 
-var isWindows = windowsRegex.test(osPlatform);
-// isWindows = true;
 
-var electronType;
+machineType = platform.os.architecture;
 
-// Flip slashes for windows
-if(isWindows){
-  rootDir = rootDir.replace(/\//g, '\\');
-  electronType = 'electron.exe';
-}
-else if(isOSX){
-  electronType = 'Electron.app/Contents/MacOS/Electron';
-}
-else{
-  // Linux
-  electronType = 'electron';
-}
-
-var electronPath = rootDir + '.electron';
-var electronApp = rootDir + '.electronApp';
-var tmpPath = rootDir + '.tmp';
-
-// Check if electron exists
-if(!test('-e', electronPath))
-  mkdir('-p', electronPath);
-
-// Create Temp dir
-if(!test('-e', tmpPath))
-  mkdir('-p', tmpPath);
-
-// Create .electronApp
-if(!test('-e', electronApp))
-  mkdir('-p', electronApp);
-
-var nodeJSversion = '0.12.2';
-
-var machineType = platform.os.architecture;
-
-var osArch = osPlatform, arch;
+osArch = osPlatform;
 
 if(machineType === 64){
   osArch += '-x64';
@@ -65,41 +41,83 @@ else{
   osArch += '-ia32';
 }
 
-var electronVersion = '0.25.2';
-var electronUrl = 'https://github.com/atom/electron/releases/download/v';
-var electronFile = 'electron-v' + electronVersion + '-' + osArch + '.zip';
+var electronVersion, electronUrl, electronFile;
 
-// If not in tmp and it is not extracted
-if(!test('-f', tmpPath + '/' + electronFile) && !test('-f', electronPath + '/' + electronType)){
-  echo('Attemping to download electron...');
-  downloadAndExtractElectron();
-}
-// You have the zip but it's not extracted
-else if(test('-f', tmpPath + '/' + electronFile) && !test('-f', electronPath + '/' + electronType)){
-  echo('Extracting electron...');
-  extractElectron();
-}
+electronVersion = '0.25.2';
+electronUrl = 'https://github.com/atom/electron/releases/download/v';
+electronFile = 'electron-v' + electronVersion + '-' + osArch + '.zip';
 
-if(test('-f', electronPath + '/' + electronType)){
-  echo('Hooray you have it!');
-  startElectron();
-}
+checkElectronStatus();
 
-function deleteTmp(){
-  if(test('-e', tmpPath))
-    rm('-r', tmpPath);
+/* Functions */
+
+
+// Flip slashes for windows
+function setElectronType(){
+  if(isWindows){
+    rootDir = rootDir.replace(/\//g, '\\');
+    electronType = 'electron.exe';
+  }
+  else if(isOSX){
+    electronType = 'Electron.app/Contents/MacOS/Electron';
+  }
+  else{
+    // Linux
+    electronType = 'electron';
+  }
+};
+
+// Create the folder for electron, electron app code, temp path and package.json
+function createFoldersFiles(){
+  // Check if electron exists
+  if(!test('-e', electronPath))
+    mkdir('-p', electronPath);
+  // Create Temp dir
+  if(!test('-e', tmpPath))
+    mkdir('-p', tmpPath);
+
+  // Create .electronApp
+  if(!test('-e', electronApp))
+    mkdir('-p', electronApp);
+
+  // Create package.json
+  if(!test('-f', rootDir + 'package.json'))
+    '{\n\t\"compile": false,\n\t\"runOnStartup\": true\n}'.to(rootDir + 'package.json');
+};
+
+function checkElectronStatus(){
+  // If not in tmp and it is not extracted
+  if(!test('-f', tmpPath + '/' + electronFile) && !test('-f', electronPath + '/' + electronType)){
+    echo('Attemping to download electron...');
+    downloadAndExtract();
+  }
+  // You have the zip but it's not extracted
+  else if(test('-f', tmpPath + '/' + electronFile) && !test('-f', electronPath + '/' + electronType)){
+    echo('Extracting electron...');
+    extractElectron();
+  }
+
+  if(test('-f', electronPath + '/' + electronType)){
+    echo('Hooray you have Electron downloaded and extracted!');
+    startElectron();
+  }
 }
 
 function startElectron(){
+	var config = electronConfig;
+  // Do not start if user has specified
+  if(!config.runOnStartup)
+    return;
+
   // Prevent execution if main.js and/or package.json are not present
   if(!test('-f', electronApp + '/main.js')){
-    echo('Failed to start electron.\nPlease create a main.js and put it into .electronApp/ or download it from: \nhttps://github.com/jrudio/meteor-electron/blob/master/main.js');
-    process.exit(1);
+    echo('Failed to start electron.\nPlease create a main.js and put it into .Electron.electronApp/ or download it from: \nhttps://github.com/jrudio/meteor-electron/blob/master/main.js');
+    return;
   }
 
   if(!test('-f', electronApp + '/package.json')){
-    echo('Failed to start electron.\nPlease create a package.json and put it into .electronApp/ or download it from: \nhttps://github.com/jrudio/meteor-electron/blob/master/package.json');
-    process.exit(1);
+    echo('Failed to start electron.\nPlease create a package.json and put it into .Electron.electronApp/ or download it from: \nhttps://github.com/jrudio/meteor-electron/blob/master/package.json');
+    return;
   }
 
   echo('Starting Electron...');
@@ -116,18 +134,25 @@ function startElectron(){
   }
 }
 
+function cleanup(){
+  if(test('-e', tmpPath))
+    rm('-r', tmpPath);
+}
+
 function extractElectron(){
   // Extract contents to electron/
   echo('Extracting electron...');
-  fs.createReadStream(tmpPath + '/' + electronFile).pipe(unzip.Extract({ path: electronPath + '/' }))
+
+  fs.createReadStream(tmpPath + '/' + electronFile)
+  .pipe(unzip.Extract({ path: electronPath + '/' }))
     .on('finish', function(){
       echo('Finished extracting electron to /.electron');
       downloadExampleFiles();
-      deleteTmp();
+      cleanup();
     });
-}
+};
 
-function downloadAndExtractElectron(){
+function downloadAndExtract(){
   request.get(electronUrl + electronVersion + '/' + electronFile)
     .on('response', function(response) {
       if(response.statusCode === 200 ){
@@ -159,7 +184,7 @@ function downloadExampleFiles(){
           console.log('Downloading main.js ...');
         }
         else{
-          console.error('Something went wrong downloading main.js. Please create your own main.js and put it into .electronApp/ \nExiting...');
+          console.error('Something went wrong downloading main.js. Please create your own main.js and put it into .Electron.electronApp/ \nExiting...');
           process.exit(1);
         }
       })
@@ -177,7 +202,7 @@ function downloadExampleFiles(){
           console.log('Downloading package.json ...');
         }
         else{
-          console.error('Something went wrong downloading package.json. Please create your own package.json and put it into .electronApp/ \nExiting...');
+          console.error('Something went wrong downloading package.json. Please create your own package.json and put it into .Electron.electronApp/ \nExiting...');
           process.exit(1);
         }
       })
