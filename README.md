@@ -11,9 +11,9 @@ Currently this is just a glorified web browser that starts when meteor starts up
 #How it works
 1.	When meteor starts up, it will check for 3 folders in the root of your app(It will be created if they are not present):
 
-		/.electron	=>Electron is downloaded here
-		/.electronApp	=>Your Electron-specific code goes here
-		/.tmp 		=>Temporary folder to download electron. This gets cleaned up when electron is unzipped.
+		/.electron		=>Electron is downloaded here
+		/.electronApp		=>Your Electron-specific code goes here
+		/.tmp 			=>Temporary folder to download electron. This gets cleaned up when electron is unzipped.
 2.	It will proceed to download Electron if not present as well as the boilerplate main.js & package.json needed for Electron
 3.	Creates a package.json in the root if one is not present
 4.	Runs Electron
@@ -36,6 +36,10 @@ You can optionally not run Electron when you start up your meteor project, to do
 *	I have only tested this on Linux(Ubuntu 15.04) & Windows 8.1
 
 *	This package does not get compiled when you build your meteor application for production, so do not have to worry about removing the package beforehand.
+
+
+######Credit
+Shoutout to sircharleswatson and the resources he used! He started the electrometeor boilerplate. I pretty much used his idea and expanded upon it for a package.
 
 
 	  
