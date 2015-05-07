@@ -172,9 +172,9 @@ function downloadExampleFiles(){
     return test('-f', electronApp + '/main.js') && test('-f', electronApp + '/package.json');
   }
 
-  var mainJSurl = 'https://raw.githubusercontent.com/jrudio/meteor-electron/master/main.js';
+  var mainJSurl = 'https://raw.githubusercontent.com/jrudio/meteor-electron/dependency/main.js';
 
-  var packageUrl = 'https://raw.githubusercontent.com/jrudio/meteor-electron/master/package.json';
+  var packageUrl = 'https://raw.githubusercontent.com/jrudio/meteor-electron/dependency/package.json';
 
   // Do the files exist?
   if(!test('-f', electronApp + '/main.js')){
