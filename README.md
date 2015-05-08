@@ -4,7 +4,7 @@
 
     meteor add jrudio:electron
     
-Currently this is just a glorified web browser that starts when meteor starts up, useful for developing your app for electron.
+This Meteor package starts when meteor starts up, useful for developing your app for electron.
 
 [Here is a demo of Electron in use with meteor](https://www.youtube.com/watch?v=1OpsJp1_OK4)
 
