@@ -19,6 +19,7 @@ Electron = (function(){
 
   var electronPath, electronApp, tmpPath, machineType, osArch;
 
+  // Use '.' as meteor does not monitor these folders for changes
   electronPath = rootDir + '.electron';
   electronApp = rootDir + '.electronApp';
   tmpPath = rootDir + '.tmp';
@@ -222,6 +223,7 @@ Electron = (function(){
     }, 2000);
   }
 
+  /* Expose methods and properties for testing */
   return {
     rootDir: rootDir,
     setElectronType: setElectronType,
