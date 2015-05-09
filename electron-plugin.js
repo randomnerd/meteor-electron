@@ -5,14 +5,16 @@ var platform = Npm.require('platform');
 
 Npm.require('shelljs/global');
 
-var rootDir, windowsRegex, electronConfig, osPlatform, isWindows;
+var rootDir, windowsRegex, electronConfig, osPlatform, isWindows, isOSX;
 
 /* Figure out where to put static files */
 rootDir = '../../../../../';
 windowsRegex = /win/i;
+osxRegex = /os(\s)?x/ig;
 
 osPlatform = platform.os.family.toLowerCase();
 isWindows = windowsRegex.test(osPlatform);
+isOSX = osxRegex.test(osPlatform);
 
 setElectronType();
 
