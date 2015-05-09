@@ -13,9 +13,10 @@ Package.describe({
 
 Npm.depends({
   'shelljs': '0.4.0',
-  'unzip': '0.1.11',
+  'electron-prebuilt': '0.25.3',
+  'electron-packager': '3.3.0',
   'request': '2.55.0',
-  'platform': '1.3.0',
+  'platform': '1.3.0'
 });
 
 Package.onUse(function(api) {
