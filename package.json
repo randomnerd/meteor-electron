@@ -1,0 +1,5 @@
+{
+	"package": false,
+	"runOnStartup": true,
+	"appName": "myApp"
+}
