@@ -7,10 +7,12 @@ var electronPackager = Npm.require('electron-packager');
 Npm.require('shelljs/global');
 
 Electron = (function(){
-  var rootDir, config, electronApp, outputPath;
+  var rootDir, config, electronApp, outputPath, isWindows;
+
+  isWindows = process.platform === 'win32' ? true : false;
 
   /* This file lives in .meteor/local/build/programs/server/packages */
-  rootDir = '../../../../../';
+  rootDir = isWindows ? '..\\..\\..\\..\\..\\' : '../../../../../';
 
   // Use '.' as meteor does not monitor these folders for changes
   electronPath = rootDir + '.electron/';
@@ -51,10 +53,14 @@ Electron = (function(){
   };
 
   function packageApp(){
+    if(isWindows){
+      return console.error('Windows is currently not supported by electron-packager');
+    }
+
     // Check if packaged app already exists
 
     if(ls(outputPath).length > 0){
-      return console.log('Please remove your app from .electron/output/dist/ \nThen, restart meteor, if you wish to package your app again.');
+      return console.error('Please remove your app from .electron/output/dist/ \nThen, restart meteor, if you wish to package your app again.');
     }
 
     console.log('Packaging up your app...');
@@ -91,7 +97,9 @@ Electron = (function(){
   }
 
   function stripPathForElectron(){
-    return electron.replace(/-new-\w+(?=\/)/, '');
+    var pathRegex = isWindows ? /-new-\w+(?=\\)/ : /-new-\w+(?=\/)/;
+
+    return electron.replace(pathRegex, '');
   }
 
 
