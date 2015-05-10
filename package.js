@@ -16,7 +16,7 @@ Npm.depends({
   'electron-prebuilt': '0.25.3',
   'electron-packager': '3.3.0',
   'request': '2.55.0',
-  'platform': '1.3.0'
+  "minimist": "1.1.1"
 });
 
 Package.onUse(function(api) {
