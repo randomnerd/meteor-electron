@@ -7,7 +7,7 @@ var electronPackager = Npm.require('electron-packager');
 Npm.require('shelljs/global');
 
 Electron = (function(){
-  var rootDir, config, electronApp, outputPath, isWindows;
+  var rootDir, config, electronApp, outputPath, isWindows, electronVersion;
 
   isWindows = process.platform === 'win32' ? true : false;
 
@@ -18,6 +18,9 @@ Electron = (function(){
   electronPath = rootDir + '.electron/';
   electronApp = electronPath + 'electronApp';
   outputPath = electronPath + 'output';
+  electronVersion = '0.25.3';
+  currentPlatform = process.platform;
+  currentArch = process.arch;
 
   createFoldersFiles();
 
@@ -25,17 +28,24 @@ Electron = (function(){
 
   config = JSON.parse(cat(rootDir + 'package.json'));
 
-  if(config.package){
-    // Don't start Electron just package
+  if(!config)
+    return console.error('Failed to read electron options in your package.json');
+
+  config = config.electron;
+
+
+  if(config.packageApp){
+
+    // Don't start Electron just package it
     packageApp();
+
   }
   else{
+
     // Run Electron
     startElectron();
   }
 
-
-  /* Functions */
 
   // Create the folder for electron, electron app code, temp path and package.json
   function createFoldersFiles(){
@@ -48,33 +58,55 @@ Electron = (function(){
       mkdir('-p', outputPath);
 
     // Create package.json
-    if(!test('-f', rootDir + 'package.json'))
-      '{\n\t\"package\": false,\n\t\"runOnStartup\": true,\n\t\"appName\": \"myApp\"\n}'.to(rootDir + 'package.json');
+    if(!test('-f', rootDir + 'package.json')){
+      var settings; 
+
+      settings = '{';
+
+      settings += '\n\t\"electron\" : {';
+
+      settings += '\n\t\t\"packageApp\": false,\n\t\t\"runOnStartup\": true,\n\t\t\"appName\": \"myApp\",';
+
+      settings += '\n\t\t\"platform\": \"' + currentPlatform + '\",\n\t\t\"arch\": \"' + currentArch + '\",';
+
+      settings += '\n\t\t\"version\": \"' + electronVersion + '\"\n';
+
+
+      settings += '\t}\n';
+      settings += '}';
+
+      settings.to(rootDir + 'package.json');
+    }
+
   };
 
   function packageApp(){
-    if(isWindows){
-      return console.error('Windows is currently not supported by electron-packager');
+    
+    // Make sure required keys are present in package.json or default to current machine info
+    if(!config.appName || !config.platform || !config.arch || !config.version){
+      return console.error('Please fill out the required parameters.\nOne or more values in your package.json is broken.');
     }
 
-    // Check if packaged app already exists
+    var buildPath = config.appName + '-' + config.platform;
 
-    if(ls(outputPath).length > 0){
-      return console.error('Please remove your app from .electron/output/dist/ \nThen, restart meteor, if you wish to package your app again.');
+    // If packaged app with the same target values already exists in /output do not package again
+    if(test('-e', outputPath + '/' + buildPath)){
+      return console.error('Your app has been packaged with those target values.\nIf you wish to package your app again, then please remove the app and start meteor again.');
     }
-
+    
     console.log('Packaging up your app...');
 
     args.dir = electronApp;
     args.name = config.appName;
 
-    if(!config.appName){
-      return console.error('Please define an appName in package.json');
-    }
+    args.platform = config.platform || currentPlatform;
+    args.arch = config.arch || currentArch;
+    args.version = config.version || electronVersion;
 
     var protocolSchemes = [].concat(args.protocol || []);
     var protocolNames = [].concat(args['protocol-name'] || []);
 
+    /* From electron-packager cli.js */
     if (protocolSchemes && protocolNames && protocolNames.length === protocolSchemes.length) {
       args.protocols = protocolSchemes.map(function (scheme, i) {
         return { schemes: [scheme], name: protocolNames[i] };
@@ -87,12 +119,11 @@ Electron = (function(){
       }
 
       // Move to outputPath
-      mv('dist/*', outputPath);
+      mv(buildPath, outputPath);
 
-      // Delete dist/
-      rm('-r', 'dist/*');
+      console.log('Moved your app to .electron/outputPath');
 
-      console.log('Moving your app to .electron/outputPath');
+      startElectron();
     });
   }
 
@@ -110,7 +141,7 @@ Electron = (function(){
 
     // Prevent execution if main.js and/or package.json are not present
     if(!test('-f', electronApp + '/main.js') || !test('-f', electronApp + '/package.json')){
-      echo('Failed to start electron.\nPlease create a main.js and package.json, then put it into .electronApp/ or download it from: \nhttps://github.com/jrudio/meteor-electron/blob/dependency/main.js\nhttps://github.com/jrudio/meteor-electron/blob/dependency/package.json');
+      echo('Failed to start electron.\nPlease create a main.js and package.json, then put it into .electron/electronApp/ or download it from: \nhttps://github.com/jrudio/meteor-electron/blob/dependency/main.js\nhttps://github.com/jrudio/meteor-electron/blob/dependency/package.json');
       downloadExampleFiles();
       return;
     }
