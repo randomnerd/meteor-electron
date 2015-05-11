@@ -1,7 +1,6 @@
 Package.describe({
   name: 'jrudio:electron',
-  version: '0.0.5',
-  // TODO: Need to revise this
+  version: '0.0.6',
   summary: 'Run your Meteor app in Electron',
   // URL to the Git repository containing the source code for this package.
   git: 'https://github.com/jrudio/meteor-electron',
@@ -14,7 +13,7 @@ Package.describe({
 Npm.depends({
   'shelljs': '0.4.0',
   'electron-prebuilt': '0.25.3',
-  'electron-packager': '3.3.0',
+  'electron-packager': '4.0.2',
   'request': '2.55.0',
   "minimist": "1.1.1"
 });
@@ -22,6 +21,7 @@ Npm.depends({
 Package.onUse(function(api) {
   api.versionsFrom('1.1.0.2');
   api.addFiles('electron-plugin.js', 'server');
+
   api.export('Electron');
 });
 
