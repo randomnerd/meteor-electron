@@ -114,8 +114,6 @@ Electron = (function(){
       });
     }
 
-    // outputPath = '\"' + outputPath + '\"';
-
     electronPackager(args, function(error, appPath){
       if(error){
         return console.error(error);
