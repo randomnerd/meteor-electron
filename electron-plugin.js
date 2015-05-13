@@ -3,21 +3,22 @@ var request = Npm.require('request');
 var electron = Npm.require('electron-prebuilt');
 var args = Npm.require('minimist')(process.argv.slice(2), {boolean: ['prune', 'asar']});
 var electronPackager = Npm.require('electron-packager');
+var path = Npm.require('path');
 
 Npm.require('shelljs/global');
 
 Electron = (function(){
-  var rootDir, config, electronApp, outputPath, isWindows, electronVersion;
-
-  isWindows = process.platform === 'win32' ? true : false;
+  var rootDir, config, electronApp, outputPath, electronVersion, settingsPath;
 
   /* This file lives in .meteor/local/build/programs/server/packages */
-  rootDir = isWindows ? '..\\..\\..\\..\\..\\' : '../../../../../';
+  rootDir = path.resolve('../../../../../');
 
   // Use '.' as meteor does not monitor these folders for changes
-  electronPath = rootDir + '.electron/';
-  electronApp = electronPath + 'electronApp';
-  outputPath = electronPath + 'output';
+  electronPath = path.join(rootDir, '.electron', '/');
+  electronApp = path.join(electronPath, 'electronApp');
+  outputPath = path.join(electronPath, 'output');
+  settingsPath = path.join(rootDir, 'package.json');
+
   electronVersion = '0.25.3';
   currentPlatform = process.platform;
   currentArch = process.arch;
@@ -26,7 +27,7 @@ Electron = (function(){
 
   electron = stripPathForElectron();
 
-  config = JSON.parse(cat(rootDir + 'package.json'));
+  config = JSON.parse(cat(settingsPath));
 
   if(!config)
     return console.error('Failed to read electron options in your package.json');
@@ -58,7 +59,7 @@ Electron = (function(){
       mkdir('-p', outputPath);
 
     // Create package.json
-    if(!test('-f', rootDir + 'package.json')){
+    if(!test('-f', settingsPath)){
       var settings; 
 
       settings = '{';
@@ -75,7 +76,7 @@ Electron = (function(){
       settings += '\t}\n';
       settings += '}';
 
-      settings.to(rootDir + 'package.json');
+      settings.to(settingsPath);
     }
 
   };
@@ -90,8 +91,8 @@ Electron = (function(){
     var buildPath = config.appName + '-' + config.platform;
 
     // If packaged app with the same target values already exists in /output do not package again
-    if(test('-e', outputPath + '/' + buildPath)){
-      return console.error('Your app has been packaged with those target values.\nIf you wish to package your app again, then please remove the app and start meteor again.');
+    if(test('-e', path.join(outputPath, '/', buildPath))){
+      return console.error('Your app has already been packaged with those target values.\nIf you wish to package your app again, then please remove the app and start meteor again.');
     }
     
     console.log('Packaging up your app...');
@@ -113,24 +114,25 @@ Electron = (function(){
       });
     }
 
+    // outputPath = '\"' + outputPath + '\"';
+
     electronPackager(args, function(error, appPath){
       if(error){
         return console.error(error);
       }
 
       // Move to outputPath
-      mv(buildPath, outputPath);
+      cp('-R', buildPath, outputPath);
+      rm('-R', buildPath);
 
-      console.log('Moved your app to .electron/outputPath');
+      console.log('Moved your app to %s', outputPath);
 
       startElectron();
     });
   }
 
   function stripPathForElectron(){
-    var pathRegex = isWindows ? /-new-\w+(?=\\)/ : /-new-\w+(?=\/)/;
-
-    return electron.replace(pathRegex, '');
+    return electron.replace(/-new-\w+/, '');
   }
 
 
@@ -140,7 +142,7 @@ Electron = (function(){
       return;
 
     // Prevent execution if main.js and/or package.json are not present
-    if(!test('-f', electronApp + '/main.js') || !test('-f', electronApp + '/package.json')){
+    if(!test('-f', path.join(electronApp, 'main.js')) || !test('-f', path.join(electronApp, 'package.json'))){
       echo('Failed to start electron.\nPlease create a main.js and package.json, then put it into .electron/electronApp/ or download it from: \nhttps://github.com/jrudio/meteor-electron/blob/dependency/main.js\nhttps://github.com/jrudio/meteor-electron/blob/dependency/package.json');
       downloadExampleFiles();
       return;
@@ -148,12 +150,15 @@ Electron = (function(){
 
     echo('Starting Electron...');
 
+    electronApp = '\"' + electronApp + '\"';
+    electron = '\"' + electron + '\"';
+
     exec(electron + ' ' + electronApp, { async: true });
   }
 
   function downloadExampleFiles(){
     function isDone(){
-      return test('-f', electronApp + '/main.js') && test('-f', electronApp + '/package.json');
+      return test('-f', path.join(electronApp, 'main.js')) && test('-f', path.join(electronApp, 'package.json'));
     }
 
     var mainJSurl = 'https://raw.githubusercontent.com/jrudio/meteor-electron/dependency/main.js';
@@ -161,7 +166,7 @@ Electron = (function(){
     var packageUrl = 'https://raw.githubusercontent.com/jrudio/meteor-electron/dependency/package.json';
 
     // Do the files exist?
-    if(!test('-f', electronApp + '/main.js')){
+    if(!test('-f', path.join(electronApp, 'main.js'))){
       request.get(mainJSurl)
         .on('response', function(response){
           if(response.statusCode === 200 ){
@@ -172,13 +177,13 @@ Electron = (function(){
             return;
           }
         })
-        .pipe(fs.createWriteStream(electronApp + '/main.js'))
+        .pipe(fs.createWriteStream(path.join(electronApp, 'main.js')))
         .on('finish', function(){
           echo('Finished downloading main.js');
         });
     }
 
-    if(!test('-f', electronApp + '/package.json')){
+    if(!test('-f', path.join(electronApp, 'package.json'))){
       echo('Downloading package.json...');
       request.get(packageUrl)
         .on('response', function(response){
@@ -190,7 +195,7 @@ Electron = (function(){
             return;
           }
         })
-        .pipe(fs.createWriteStream(electronApp + '/package.json'))
+        .pipe(fs.createWriteStream(path.join(electronApp, 'package.json')))
         .on('finish', function(){
           echo('Finished downloading package.json');
         });
