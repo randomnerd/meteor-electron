@@ -1,6 +1,6 @@
 Package.describe({
   name: 'jrudio:electron',
-  version: '0.0.6',
+  version: '0.0.7',
   summary: 'Run your Meteor app in Electron',
   // URL to the Git repository containing the source code for this package.
   git: 'https://github.com/jrudio/meteor-electron',

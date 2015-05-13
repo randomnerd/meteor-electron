@@ -70,6 +70,11 @@ Shoutout to sircharleswatson and the resources he used! He started the electrome
 
 =======
 #History
+
+###v0.0.7
+
+Fixed path issues on windows by using npm module path. Also, tweaked how Electron is started as paths that contain spaces broke everything
+
 ###v0.0.6
 
 Updated Electron-packager to 4.0.2 (Windows support). Extra parameters are required.
