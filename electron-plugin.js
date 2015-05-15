@@ -1,11 +1,14 @@
+Npm.require('shelljs/global');
+var path = Npm.require('path');
+var packagePath = Npm.require('meteor-package-path');
+setElectronPath();
+
 var fs = Npm.require('fs');
 var request = Npm.require('request');
 var electron = Npm.require('electron-prebuilt');
 var args = Npm.require('minimist')(process.argv.slice(2), {boolean: ['prune', 'asar']});
 var electronPackager = Npm.require('electron-packager');
-var path = Npm.require('path');
 
-Npm.require('shelljs/global');
 
 Electron = (function(){
   var rootDir, config, electronApp, outputPath, electronVersion, settingsPath;
@@ -133,7 +136,6 @@ Electron = (function(){
     return electron.replace(/-new-\w+/, '');
   }
 
-
   function startElectron(){
     // Do not start if user has specified not to
     if(!config.runOnStartup)
@@ -219,3 +221,15 @@ Electron = (function(){
     createFoldersFiles: createFoldersFiles
   };
 })();
+
+
+function setElectronPath(){
+  var startDir = pwd();
+
+  cd(path.join(packagePath, '..', 'electron-prebuilt'));
+
+  // have electron-prebuilt set electron path
+  exec('node install.js');
+
+  cd(startDir);
+}
