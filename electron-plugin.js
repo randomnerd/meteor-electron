@@ -72,6 +72,10 @@ Electron = (function(){
       settings += '\n\t\t\"packageApp\": false,\n\t\t\"runOnStartup\": true,\n\t\t\"appName\": \"myApp\",';
 
       settings += '\n\t\t\"platform\": \"' + currentPlatform + '\",\n\t\t\"arch\": \"' + currentArch + '\",';
+      settings += '\n\t\t\"out\": \"\",\n\t\t\"icon\": \"\",';
+      settings += '\n\t\t\"app-bundle-id\": \"\",\n\t\t\"app-version\": \"\",';
+      settings += '\n\t\t\"helper-bundle-id\": \"\",\n\t\t\"ignore\": \"\",';
+      settings += '\n\t\t\"prune\": \"\",\n\t\t\"asar\": \"\",';
 
       settings += '\n\t\t\"version\": \"' + electronVersion + '\"\n';
 
@@ -103,9 +107,20 @@ Electron = (function(){
     args.dir = electronApp;
     args.name = config.appName;
 
+    /* Required arguments */
     args.platform = config.platform || currentPlatform;
     args.arch = config.arch || currentArch;
     args.version = config.version || electronVersion;
+
+    /* Optional arguments */
+    if(config.out) { args.out = config.out; }
+    if(config.icon) { args.icon = config.icon; }
+    if(config['app-bundle-id']) { args['app-bundle-id'] = config['app-bundle-id']; }
+    if(config['app-version']) { args['app-version'] = config['app-version']; }
+    if(config['helper-bundle-id']) { args['helper-bundle-id'] = config['helper-bundle-id']; }
+    if(config.ignore) { args.ignore = config.ignore; }
+    if(config.prune) { args.prune = config.prune; }
+    if(config.asar === true) { args.asar = config.asar; }
 
     var protocolSchemes = [].concat(args.protocol || []);
     var protocolNames = [].concat(args['protocol-name'] || []);
@@ -122,11 +137,20 @@ Electron = (function(){
         return console.error(error);
       }
 
-      // Move to outputPath
-      cp('-R', buildPath, outputPath);
-      rm('-R', buildPath);
+      var out;
 
-      console.log('Moved your app to %s', outputPath);
+      // Move to outputPath if 'out' was not defined
+      if(!config.out){
+
+        cp('-R', buildPath, outputPath);
+        rm('-R', buildPath);
+        out = outputPath;
+      }
+      else{
+        out = appPath;
+      }
+
+      console.log('Moved your app to %s', out);
 
       startElectron();
     });
