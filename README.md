@@ -18,9 +18,13 @@ This Meteor package starts when meteor starts up, useful for developing your app
 		  -  /output 		     =>   Your app will be sent here when you package it
 2.	It will proceed to download the boilerplate main.js & package.json needed for Electron
 3.	Creates a package.json in the root if one is not present
+4.	Looks for the `electron` object for the settings
 4.	Runs Electron
 
 ###Packaging Your App For Electron
+
+######Please refer to [electron-packager's docs](https://github.com/maxogden/electron-packager) for documentation on required and optional arguments
+
 
 1.  In your package.json set 
 
@@ -65,8 +69,11 @@ These are the currently available options in your package.json
 *	This package does not get compiled when you build your meteor application for production, so do not have to worry about removing the package beforehand.
 * You cannot run your packaged app as a standalone app at this time, it just points to http://localhost:3000/ (I plan on integrating that).
 
-######Credit
-Shoutout to sircharleswatson and the resources he used! He started the electrometeor boilerplate. I pretty much used his idea and expanded upon it for a package.
+######Credits
+Shoutout to sircharleswatson! He started the electrometeor boilerplate. I pretty much used his idea and expanded upon it for a package. 
+
+maxogden [Electron-packager](https://github.com/maxogden/electron-packager)
+mafintosh[Electron-prebuilt](https://github.com/mafintosh/electron-prebuilt)
 
 =======
 #History
