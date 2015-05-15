@@ -73,7 +73,8 @@ These are the currently available options in your package.json
 Shoutout to sircharleswatson! He started the electrometeor boilerplate. I pretty much used his idea and expanded upon it for a package. 
 
 maxogden [Electron-packager](https://github.com/maxogden/electron-packager)
-mafintosh[Electron-prebuilt](https://github.com/mafintosh/electron-prebuilt)
+
+mafintosh [Electron-prebuilt](https://github.com/mafintosh/electron-prebuilt)
 
 =======
 #History
