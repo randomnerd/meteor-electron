@@ -71,6 +71,9 @@ Shoutout to sircharleswatson and the resources he used! He started the electrome
 =======
 #History
 
+###v0.0.19(Yes I messed up the versioning)
+Fixed Electron not starting error
+
 ###v0.0.7
 
 Fixed path issues on windows by using npm module path. Also, tweaked how Electron is started as paths that contain spaces broke everything
