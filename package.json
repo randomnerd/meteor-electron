@@ -4,7 +4,7 @@
     "electron-prebuilt": "0.26.0",
     "minimist": "1.1.1",
     "request": "2.55.0",
-    "shelljs": "0.4.0"
+    "shelljs": "0.4.0",
     "meteor-package-path": "0.0.1"
   }
 }
