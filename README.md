@@ -24,19 +24,19 @@ This Meteor package starts when meteor starts up, useful for developing your app
 
 1.  In your package.json set 
 
-    "packageApp": true
+    `"packageApp": true`
 
 2.  Fill out your target platform
 
-    "platform": "linux"
+    `"platform": "linux"`
 
 3.  Fill out the target architecture
 
-    "arch": "x64"
+    `"arch": "x64"`
 
 4.  Set the version of Electron you want it packaged up with(Defaults to 0.25.3)
 
-    "version": "0.25.3"
+    `"version": "0.25.3"`
 
 5.  Start up meteor
 
