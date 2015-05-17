@@ -112,7 +112,7 @@ app.on('ready', function() {
 
   setInterval(function(){
     // console.log('Meteor started env: %s \n', process.env.METEOR_STARTED);
-    console.log('MeteorAppPath: %s', meteor.appPath);
+    // console.log('MeteorAppPath: %s', meteor.appPath);
     global.splashWindow.send('meteor-has-started', process.env.METEOR_STARTED);
   }, 900);
 });

@@ -24,7 +24,7 @@ var Download = {};
 var Start = {};
 var Extract = {};
 
-var meteorPID, startDir = pwd();
+var meteor, meteorPID, startDir = pwd();
 
 
 module.exports = {
@@ -45,7 +45,12 @@ module.exports = {
 
     cd(self.appPath);
 
-    var meteor = spawn('meteor');
+    meteor = exec('meteor');
+
+    meteor.stderr.on('error', function(data){
+      console.log(data.toString());
+    });
+
     var starting = process.env.METEOR_STARTED ? false : true;
 
     meteor.stdout.on('data', function(data){
@@ -69,8 +74,8 @@ module.exports = {
     meteorPID = meteor.pid;
   },
   stop: function(splashWindow){
-    if(!meteorPID || !process.env.METEOR_STARTED)
-      return console.log('Meteor was not started!');
+    // if(!meteorPID || !process.env.METEOR_STARTED)
+    //   return console.log('Meteor was not started!');
 
     killMeteor();
   },
@@ -85,6 +90,8 @@ module.exports = {
       },
       properties: ['openDirectory']
     }, function(appPath){
+      if(!appPath)
+        return console.log('No application selected');
       console.log(appPath);
       // Set meteor app path
       self.appPath = appPath.length > 0 ? appPath[0] : null;
@@ -93,16 +100,89 @@ module.exports = {
 };
 
 function killMeteor(){
-  ps.kill(meteorPID, function(err){
-    if(err){
-      throw new Error( err );
-    }
-    else{
-      console.log( 'Meteor has been shutdown!');
-      meteorPID = null;
-      process.env.METEOR_STARTED = '';
-    }
-  });
+  if(process.platform){
+    var meteorRegex = /\.meteor/i, nodePID, mongoPID;
+    // console.log( 'Meteor has been shutdown!');
+    // Kill node && mongod for windows
+    
+    // Check if node process is related to meteor via arguments
+
+    ps.lookup({ command: 'node' }, function(err, res){
+      if(err){
+        throw new Error( err );
+      }
+
+      // console.log(res);
+
+      res.forEach(function(v){
+
+        v.arguments.forEach(function(args){
+          if(meteorRegex.test(args)){
+            nodePID = v.pid
+            console.log('Node PID %s', nodePID);
+          }
+        });
+      });
+
+      exec('taskkill /F /PID ' + nodePID);
+      exec('taskkill /F /PID ' + meteorPID);
+
+
+      // ps.kill(meteorPID, function(err, res){
+      // ps.kill(mongoPID, function(err, res){
+      //   if(err){
+      //     throw new Error( err );
+      //   }
+      //   else{
+      //     console.log( 'Meteor has been shutdown!');
+      //     meteorPID = null;
+      //     process.env.METEOR_STARTED = '';
+      //   }
+      // });
+    });
+
+    // ps.lookup({ command: 'mongo' }, function(err, res){
+    //   if(err){
+    //     throw new Error( err );
+    //   }
+
+    //   res.forEach(function(proc){
+    //     proc.arguments.forEach(function(args){
+    //       if(meteorRegex.test(args)){
+    //         mongoPID = proc.pid;
+    //         console.log('Mongod PID %s', mongoPID);
+    //       }
+    //     });
+    //   });
+
+    //   exec('taskkill /F /PID ' + mongoPID);
+
+    //   // ps.kill(meteorPID, function(err, res){
+    //   // ps.kill(mongoPID, function(err, res){
+    //   //   if(err){
+    //   //     throw new Error( err );
+    //   //   }
+    //   //   else{
+    //   //     console.log( 'Meteor has been shutdown!');
+    //   //     meteorPID = null;
+    //   //     process.env.METEOR_STARTED = '';
+    //   //   }
+    //   // });
+    // });
+  }
+  else{
+    /* UNIX FTW */
+    ps.kill(meteorPID, function(err, res){
+      if(err){
+        throw new Error( err );
+      }
+      else{
+        console.log( 'Meteor has been shutdown!');
+        meteorPID = null;
+        process.env.METEOR_STARTED = '';
+      }
+    });
+  }
 }
 
 // Start.mongo = function(){
