@@ -79,6 +79,10 @@ mafintosh [Electron-prebuilt](https://github.com/mafintosh/electron-prebuilt)
 =======
 #History
 
+###v0.0.20
+Added the optional electron-packager options
+
+
 ###v0.0.19(Yes I messed up the versioning)
 Fixed Electron not starting error
 
