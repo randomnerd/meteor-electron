@@ -37,7 +37,7 @@ function killMeteor(){
   var canKillMeteor = process.env.KILL_METEOR_ON_EXIT;
   var meteorPID = process.env.METEOR_PARENT_PID;
 
-  if(canKillMeteor === 'false')
+  if(canKillMeteor)
     return;
 
   process.kill(meteorPID, 'SIGKILL');
