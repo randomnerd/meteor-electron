@@ -12,6 +12,7 @@
     "tar.gz": "^0.1.1"
   },
   "dependencies": {
-    "ps-node": "0.0.4"
+    "ps-node": "0.0.4",
+    "ps-tree": "^1.0.0"
   }
 }
