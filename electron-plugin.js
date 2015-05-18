@@ -69,7 +69,7 @@ Electron = (function(){
 
       settings += '\n\t\"electron\" : {';
 
-      settings += '\n\t\t\"killMeteorOnExit\": true,\n';
+      settings += '\n\t\t\"killMeteorOnExit\": true,';
       settings += '\n\t\t\"packageApp\": false,\n\t\t\"runOnStartup\": true,\n\t\t\"appName\": \"myApp\",';
 
       settings += '\n\t\t\"platform\": \"' + currentPlatform + '\",\n\t\t\"arch\": \"' + currentArch + '\",';
