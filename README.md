@@ -79,6 +79,9 @@ mafintosh [Electron-prebuilt](https://github.com/mafintosh/electron-prebuilt)
 =======
 #History
 
+###v0.0.21
+Added option to kill meteor when electron is closed
+
 ###v0.0.20
 Added the optional electron-packager options
 
