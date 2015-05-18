@@ -12,6 +12,7 @@ var mainWindow = null;
 app.on('window-all-closed', function() {
   if (process.platform != 'darwin')
     app.quit();
+  killMeteor();
 });
 
 // This method will be called when Electron has done everything
@@ -31,3 +32,13 @@ app.on('ready', function() {
     mainWindow = null;
   });
 });
+
+function killMeteor(){
+  var canKillMeteor = process.env.KILL_METEOR_ON_EXIT;
+  var meteorPID = process.env.METEOR_PARENT_PID;
+
+  if(canKillMeteor === 'false')
+    return;
+
+  process.kill(meteorPID, 'SIGKILL');
+}
