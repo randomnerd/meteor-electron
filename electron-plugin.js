@@ -20,7 +20,7 @@ Electron = (function(){
   electronApp = path.join(electronPath, 'electronApp');
   outputPath = path.join(electronPath, 'output');
 
-  electronVersion = '0.25.3';
+  electronVersion = '0.27.3';
   currentPlatform = process.platform;
   currentArch = process.arch;
 
