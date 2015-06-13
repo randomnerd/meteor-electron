@@ -12,7 +12,6 @@ var electronPackager = Npm.require('electron-packager');
 
 Electron = (function(){
   var rootDir, config, electronApp, outputPath, electronVersion, settingsPath;
-
   /* This file lives in .meteor/local/build/programs/server/packages */
   rootDir = path.resolve('../../../../../');
 
@@ -20,7 +19,6 @@ Electron = (function(){
   electronPath = path.join(rootDir, '.electron', '/');
   electronApp = path.join(electronPath, 'electronApp');
   outputPath = path.join(electronPath, 'output');
-  settingsPath = path.join(rootDir, 'package.json');
 
   electronVersion = '0.25.3';
   currentPlatform = process.platform;
@@ -30,13 +28,14 @@ Electron = (function(){
 
   electron = stripPathForElectron();
 
+
   config = JSON.parse(cat(settingsPath));
 
-  if(!config)
-    return console.error('Failed to read electron options in your package.json');
+  
+  if(!config || !config.electron)
+    return console.error('Failed to read electron options in your package.json/settings.json');
 
   config = config.electron;
-
 
   if(config.packageApp){
 
@@ -61,28 +60,43 @@ Electron = (function(){
     if(!test('-e', outputPath))
       mkdir('-p', outputPath);
 
-    // Create package.json
+    // Determine settings file
+    if(test('-e', path.join(rootDir, 'package.json'))  && JSON.parse(cat(path.join(rootDir, 'package.json'))).electron){
+      settingsPath = path.join(rootDir, 'package.json')
+    }
+    else if(test('-e', path.join(rootDir, 'settings.json')) && JSON.parse(cat(path.join(rootDir, 'settings.json'))).electron){
+      settingsPath = path.join(rootDir, 'settings.json');
+    }
+    else{
+      settingsPath = path.join(rootDir, 'settings.json');
+    }
+
+
+    // Create settings.json / package.json
     if(!test('-f', settingsPath)){
       var settings; 
 
-      settings = '{';
+      settings = {
+        electron: {
+          killMeteorOnExit: true,
+          packageApp: false,
+          runOnStartup: true,
+          appName: 'myApp',
+          platform: currentPlatform,
+          arch: currentArch,
+          out: '',
+          icon: '',
+          'app-bundle-id': '',
+          'app-version': '',
+          'helper-bundle-id': '',
+          ignore: '',
+          prune: '',
+          asar: '',
+          version: electronVersion
+        }
+      }
 
-      settings += '\n\t\"electron\" : {';
-
-      settings += '\n\t\t\"killMeteorOnExit\": true,';
-      settings += '\n\t\t\"packageApp\": false,\n\t\t\"runOnStartup\": true,\n\t\t\"appName\": \"myApp\",';
-
-      settings += '\n\t\t\"platform\": \"' + currentPlatform + '\",\n\t\t\"arch\": \"' + currentArch + '\",';
-      settings += '\n\t\t\"out\": \"\",\n\t\t\"icon\": \"\",';
-      settings += '\n\t\t\"app-bundle-id\": \"\",\n\t\t\"app-version\": \"\",';
-      settings += '\n\t\t\"helper-bundle-id\": \"\",\n\t\t\"ignore\": \"\",';
-      settings += '\n\t\t\"prune\": \"\",\n\t\t\"asar\": \"\",';
-
-      settings += '\n\t\t\"version\": \"' + electronVersion + '\"\n';
-
-
-      settings += '\t}\n';
-      settings += '}';
+      settings = JSON.stringify(settings, null, '\t');
 
       settings.to(settingsPath);
     }
