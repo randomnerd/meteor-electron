@@ -24,9 +24,11 @@ Package.onUse(function(api) {
 
   api.versionsFrom('1.1.0.2');
 
-  api.use('grigio:babel@0.1.3');
+  api.use('templating', 'client')
+
   api.addFiles('electron-plugin.js', 'server');
-  api.addFiles(path.join(client, 'env.es6.js'), 'client');
+  api.addFiles(path.join(client, 'env.js'), 'client');
+  api.addFiles(path.join(client, 'helpers.js'), 'client');
   api.export('Electron');
 });
 
