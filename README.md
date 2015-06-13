@@ -26,7 +26,7 @@ This Meteor package starts when meteor starts up, useful for developing your app
 ######Please refer to [electron-packager's docs](https://github.com/maxogden/electron-packager) for documentation on required and optional arguments
 
 
-1.  In your package.json set 
+1.  In your settings.json set 
 
     `"packageApp": true`
 
