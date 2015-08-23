@@ -14,15 +14,15 @@ This Meteor package starts when meteor starts up, useful for developing your app
 1.  When meteor starts up, it will create 1 folder in the root of your app and 2 sub-folders:
 
     /.electron           =>   Electron is downloaded here
-      -  /electronApp    =>   Your Electron-specific code goes here
+      -  /app            =>   Your Electron-specific code goes here - You can make changes to how your Electron app works
       -  /output         =>   Your app will be sent here when you package it
-2.  It will proceed to download the boilerplate main.js & package.json needed for Electron
-3.  Creates a package.json in the root if one is not present
+2.  It will proceed to copy the default main.js & package.json
+3.  Creates an electron.json in the root if one is not present
 4.  Runs Electron
 
 ###Packaging Your App For Electron
 
-1.  In your package.json set 
+1.  In your electron.json set 
 
     "packageApp": true
 
@@ -34,12 +34,12 @@ This Meteor package starts when meteor starts up, useful for developing your app
 
     "arch": "x64"
 
-4.  Set the version of Electron you want it packaged up with(Defaults to 0.25.3)
+4.  Set the version of Electron you want it packaged up with(Defaults to 0.31.0)
 
-    "version": "0.25.3"
+    "version": "0.31.0"
 
 5.  Start up meteor
 
-6. Wait for a message saying "Moved your app to .electron/output/<appName-platform>"
+6. Wait for a message saying "Your app has been packaged to .electron/output/<appName-platform>"
 
 Go to the github repo to read the rest of the README

@@ -1,6 +1,6 @@
 Package.describe({
   name: 'jrudio:electron',
-  version: '0.0.21',
+  version: '0.1.0',
   summary: 'Run your Meteor app in Electron',
   // URL to the Git repository containing the source code for this package.
   git: 'https://github.com/jrudio/meteor-electron',
@@ -12,28 +12,35 @@ Package.describe({
 
 Npm.depends({
   'shelljs': '0.4.0',
-  'electron-prebuilt': '0.27.3',
-  'electron-packager': '4.1.2',
-  'request': '2.55.0',
-  'meteor-package-path': '0.0.1',
-  "minimist": "1.1.1"
+  'electron-prebuilt': '0.31.0',
+  'electron-packager': '5.0.2'
 });
 
 Package.onUse(function(api) {
-  var path = Npm.require('path'), client = path.join('lib', 'client'), lib = path.join('lib', 'lib'), server = path.join('lib', 'server');
+  api.use('underscore')
 
   api.versionsFrom('1.1.0.2');
 
-  api.use('templating', 'client')
+  var server = {
+    path: 'server',
+    files: [],
+    add: function (_path) {
+      var path = Npm.require('path')
 
-  api.addFiles('electron-plugin.js', 'server');
-  api.addFiles(path.join(client, 'env.js'), 'client');
-  api.addFiles(path.join(client, 'helpers.js'), 'client');
-  api.export('Electron');
-});
+      _path = path.join('server', _path)
 
-Package.onTest(function(api) {
-  api.use('tinytest');
-  api.use('jrudio:electron');
-  api.addFiles('electron-plugin-tests.js', 'server');
+      this.files.push(_path)
+
+      return this
+    }
+  }
+
+  server.add('helpers.js')
+  server.add('folder.js')
+  server.add('files.js')
+  server.add('prebuilt.js')
+  server.add('packager.js')
+  server.add('main.js')
+
+  api.addFiles(server.files, 'server');
 });
