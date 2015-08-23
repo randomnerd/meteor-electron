@@ -7,7 +7,7 @@ Electron.startApp = function () {
   var cat = shelljs.cat
 
   var regex = {
-    electron: /-new-\w+(?=\/node_modules)/
+    electron: /-new-\w+(?=\/|\\node_modules)/
   }
 
   // Need to remove dynamic package naming used by meteor
