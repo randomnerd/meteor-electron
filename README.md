@@ -68,6 +68,10 @@ These are the currently available options in your package.json
 *	I have only tested this on Linux(Ubuntu 15.04) & Windows 8.1
 *	This package does not get compiled when you build your meteor application for production, so do not have to worry about removing the package beforehand.
 * You cannot run your packaged app as a standalone app at this time, it just points to http://localhost:3000/ (I plan on integrating that).
+* 
+
+##Alternatives
+[electrify](https://github.com/arboleya/electrify) built by @arboleya: This package offers a more intuitive solution to running/packaging your app on desktop
 
 ######Credits
 Shoutout to sircharleswatson! He started the electrometeor boilerplate. I pretty much used his idea and expanded upon it for a package. 
