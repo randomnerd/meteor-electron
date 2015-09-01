@@ -1,4 +1,6 @@
 #Update
+[Demo](https://www.youtube.com/watch?v=J6a98VIxgu0)
+
 If you would like to use the meteor command line tool version of this package (No need to add `jrudio:electron`), execute the following in your terminal:
 
 `meteor --release jrudio:METEOR@1.1.0 add-desktop`
