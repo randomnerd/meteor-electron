@@ -1,4 +1,4 @@
-#Meteor-tool extended with desktop support
+#NEW: Meteor-tool extended with desktop support
 [Demo of the meteor-tool in action](https://www.youtube.com/watch?v=J6a98VIxgu0)
 
 [Repo](https://github.com/jrudio/meteor)
@@ -111,6 +111,8 @@ These are the currently available options in your package.json
 
 ##Alternatives
 [electrify](https://github.com/arboleya/electrify) built by @arboleya: This package offers a more intuitive solution to running/packaging your app on desktop
+
+[Meteor Tool](https://github.com/jrudio/meteor) by jrudio: Meteor tool extended for desktop support
 
 ######Credits
 Shoutout to sircharleswatson! He started the electrometeor boilerplate. I pretty much used his idea and expanded upon it for a package. 
