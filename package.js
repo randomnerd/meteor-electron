@@ -1,6 +1,7 @@
 Package.describe({
-  name: 'jrudio:electron',
-  version: '0.1.0',
+  name: 'jrudio:do-not-dl',
+  version: '0.1.1',
+  // version: '0.1.0',
   summary: 'Run your Meteor app in Electron',
   // URL to the Git repository containing the source code for this package.
   git: 'https://github.com/jrudio/meteor-electron',
@@ -8,18 +9,19 @@ Package.describe({
   // To avoid submitting documentation, set this field to null.
   documentation: 'meteor-readme.md',
   debugOnly: true
-});
+})
 
 Npm.depends({
   'shelljs': '0.4.0',
-  'electron-prebuilt': '0.31.0',
-  'electron-packager': '5.0.2'
-});
+  'electron-prebuilt': '0.33.3',
+  'electron-packager': '5.1.0'
+})
 
 Package.onUse(function(api) {
   api.use('underscore')
+  api.use('ecmascript')
 
-  api.versionsFrom('1.1.0.2');
+  api.versionsFrom('1.2.0.1')
 
   var server = {
     path: 'server',
@@ -42,5 +44,5 @@ Package.onUse(function(api) {
   server.add('packager.js')
   server.add('main.js')
 
-  api.addFiles(server.files, 'server');
-});
+  api.addFiles(server.files, 'server')
+})
