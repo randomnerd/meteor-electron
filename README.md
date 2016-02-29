@@ -71,9 +71,12 @@ These are the currently available options in your package.json
 * 
 
 ##Alternatives
+
+[Follow these instructions](./desktop-readme.md) if you want to quickly package your Meteor application
+
 [electrify](https://github.com/arboleya/electrify) built by @arboleya: This package offers a more intuitive solution to running/packaging your app on desktop
 
-[Meteor Tool](https://github.com/jrudio/meteor) by jrudio: Meteor tool extended for desktop support
+[Meteor Tool](https://github.com/jrudio/meteor) by jrudio: Meteor tool modified for desktop support
 
 ######Credits
 Shoutout to sircharleswatson! He started the electrometeor boilerplate. I pretty much used his idea and expanded upon it for a package. 
