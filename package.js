@@ -1,9 +1,9 @@
 Package.describe({
-  name: 'jrudio:electron',
-  version: '0.0.21',
+  name: 'randomnerd:electron',
+  version: '0.1.1',
   summary: 'Run your Meteor app in Electron',
   // URL to the Git repository containing the source code for this package.
-  git: 'https://github.com/jrudio/meteor-electron',
+  git: 'https://github.com/randomnerd/meteor-electron',
   // By default, Meteor will default to using README.md for documentation.
   // To avoid submitting documentation, set this field to null.
   documentation: 'meteor-readme.md',
@@ -12,8 +12,8 @@ Package.describe({
 
 Npm.depends({
   'shelljs': '0.4.0',
-  'electron-prebuilt': '0.27.3',
-  'electron-packager': '4.1.2',
+  'electron-prebuilt': '0.36.9',
+  'electron-packager': '5.2.1',
   'request': '2.55.0',
   'meteor-package-path': '0.0.1',
   "minimist": "1.1.1"
@@ -34,6 +34,6 @@ Package.onUse(function(api) {
 
 Package.onTest(function(api) {
   api.use('tinytest');
-  api.use('jrudio:electron');
+  api.use('randomnerd:electron');
   api.addFiles('electron-plugin-tests.js', 'server');
 });
